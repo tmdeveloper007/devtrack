@@ -9,6 +9,9 @@ const IV_LENGTH = 12;
 const AUTH_TAG_LENGTH = 16;
 const KEY_ERROR_MESSAGE =
   "ENCRYPTION_KEY env var must be a 32-byte hex string";
+const ENCRYPTED_TOKEN_ERROR_MESSAGE =
+  "Encrypted token must be a hex string containing ciphertext and auth tag";
+const IV_ERROR_MESSAGE = "Token IV must be a 12-byte hex string";
 
 function getEncryptionKey(): Buffer {
   const key = process.env.ENCRYPTION_KEY;
@@ -48,6 +51,15 @@ export function encryptToken(plaintext: string): {
 
 export function decryptToken(encrypted: string, iv: string): string {
   const key = getEncryptionKey();
+
+  if (!/^[0-9a-fA-F]+$/.test(encrypted) || encrypted.length < AUTH_TAG_LENGTH * 2) {
+    throw new Error(ENCRYPTED_TOKEN_ERROR_MESSAGE);
+  }
+
+  if (!/^[0-9a-fA-F]{24}$/.test(iv)) {
+    throw new Error(IV_ERROR_MESSAGE);
+  }
+
   const encryptedBuffer = Buffer.from(encrypted, "hex");
   const ivBuffer = Buffer.from(iv, "hex");
 
