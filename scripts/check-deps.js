@@ -10,11 +10,16 @@ const path = require("path");
 
 // Node built-ins (not in package.json but valid to import)
 const BUILTINS = new Set([
-  "assert", "buffer", "child_process", "cluster", "crypto", "dgram",
+  "assert", "assert/strict", "buffer", "child_process", "cluster", "crypto", "dgram",
   "dns", "domain", "events", "fs", "http", "http2", "https", "module",
-  "net", "os", "path", "perf_hooks", "process", "punycode", "querystring",
-  "readline", "repl", "stream", "string_decoder", "timers", "tls", "tty",
+  "net", "node", "os", "path", "perf_hooks", "process", "punycode", "querystring",
+  "readline", "repl", "stream", "string_decoder", "test", "timers", "tls", "tty",
   "url", "util", "v8", "vm", "wasi", "worker_threads", "zlib",
+]);
+
+// Node.js built-in submodules (node:xxx format)
+const NODE_BUILTINS = new Set([
+  "node:test", "node:assert", "node:assert/strict",
 ]);
 
 // Next.js / framework aliases that resolve internally
@@ -74,6 +79,7 @@ function collectMissingDeps(files, allDeps, cwd = process.cwd()) {
     for (const mod of extractImports(src)) {
       // Skip relative imports, path aliases (@/ is the src alias — not a pkg)
       if (mod.startsWith(".") || mod.startsWith("/") || mod.startsWith("@/")) continue;
+      if (mod.startsWith("node:") && NODE_BUILTINS.has(mod)) continue;
       const pkgName = extractPackageName(mod);
       if (BUILTINS.has(pkgName) || FRAMEWORK_ALIASES.has(pkgName)) continue;
       if (allDeps.has(pkgName)) continue;
