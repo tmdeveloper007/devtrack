@@ -110,8 +110,11 @@ export async function fetchIssuesMetrics(
 
   const repoCounts: Record<string, number> = {};
   for (const item of items) {
-    const repo = item.repository_url.split("/").pop() ?? "";
-    repoCounts[repo] = (repoCounts[repo] ?? 0) + 1;
+    const parts = item.repository_url.split("/");
+    const repo = parts.length >= 2 ? parts.pop()! : item.repository_url;
+    if (repo) {
+      repoCounts[repo] = (repoCounts[repo] ?? 0) + 1;
+    }
   }
   const mostActiveRepo =
     Object.keys(repoCounts).length > 0
