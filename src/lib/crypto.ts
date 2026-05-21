@@ -49,15 +49,15 @@ export function encryptToken(plaintext: string): {
   };
 }
 
-export function decryptToken(encrypted: string, iv: string): string {
+export function decryptToken(encrypted: string, iv: string): string | null {
   const key = getEncryptionKey();
 
-  if (!/^[0-9a-fA-F]+$/.test(encrypted) || encrypted.length < AUTH_TAG_LENGTH * 2) {
-    throw new Error(ENCRYPTED_TOKEN_ERROR_MESSAGE);
+  if (!/^[0-9a-fA-F]+$/.test(encrypted) || encrypted.length <= AUTH_TAG_LENGTH * 2) {
+    return null;
   }
 
   if (!/^[0-9a-fA-F]{24}$/.test(iv)) {
-    throw new Error(IV_ERROR_MESSAGE);
+    return null;
   }
 
   const encryptedBuffer = Buffer.from(encrypted, "hex");

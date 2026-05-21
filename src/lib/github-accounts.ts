@@ -36,7 +36,7 @@ export async function getLinkedTokens(userId: string): Promise<string[]> {
 
   return rows.map((row) =>
     decryptToken(row.access_token_encrypted, row.access_token_iv)
-  );
+  ).filter((token): token is string => token !== null);
 }
 
 export async function getRateLimitRemaining(token: string): Promise<number> {
@@ -114,7 +114,7 @@ export async function getLinkedAccounts(
     githubId: row.github_id ?? "",
     githubLogin: row.github_login ?? "",
     token: decryptToken(row.access_token_encrypted, row.access_token_iv),
-  }));
+  })).filter((account): account is LinkedAccount => account.token !== null);
 }
 
 export async function getAllAccounts(
