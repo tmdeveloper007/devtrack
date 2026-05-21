@@ -31,7 +31,7 @@ export async function GET() {
 
   const hasFreeze = Array.isArray(pending) && pending.length > 0;
 
-  return Response.json({ hasFreeze, freezeDate: hasFreeze ? pending![0].freeze_date : null });
+  return Response.json({ hasFreeze, freezeDate: hasFreeze ? pending[0].freeze_date : null });
 }
 
 // POST /api/streak/freeze
