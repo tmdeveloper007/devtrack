@@ -8,6 +8,10 @@ export async function resolveAppUser(
   githubId: string,
   githubLogin?: string
 ): Promise<AppUser | null> {
+  if (!githubId || githubId.trim().length === 0) {
+    return null;
+  }
+
   const { data: existing } = await supabaseAdmin
     .from("users")
     .select("id")
