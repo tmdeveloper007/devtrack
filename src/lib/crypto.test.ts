@@ -20,28 +20,28 @@ describe('encryptToken', () => {
 });
 
 describe('decryptToken', () => {
-  it('should throw on invalid hex input with odd length', () => {
+  it('should return null on invalid hex input with odd length', () => {
     const { encrypted, iv } = encryptToken('test');
     const invalidEncrypted = encrypted.slice(0, -1);
     const result = decryptToken(invalidEncrypted, iv);
     assert.strictEqual(result, null);
   });
 
-  it('should throw on invalid hex input with non-hex characters', () => {
+  it('should return null on invalid hex input with non-hex characters', () => {
     const { encrypted, iv } = encryptToken('test');
     const invalidEncrypted = encrypted.replace('a', 'x');
     const result = decryptToken(invalidEncrypted, iv);
     assert.strictEqual(result, null);
   });
 
-  it('should throw on invalid IV length', () => {
+  it('should return null on invalid IV length', () => {
     const { encrypted } = encryptToken('test');
     const invalidIv = '0'.repeat(20);
     const result = decryptToken(encrypted, invalidIv);
     assert.strictEqual(result, null);
   });
 
-  it('should throw on encrypted token that is too short', () => {
+  it('should return null on encrypted token that is too short', () => {
     const { iv } = encryptToken('test');
     const result = decryptToken('aabbcc', iv);
     assert.strictEqual(result, null);
