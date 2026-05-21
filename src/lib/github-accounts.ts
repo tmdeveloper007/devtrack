@@ -164,7 +164,7 @@ export async function getAccountToken(
     .eq("github_id", accountGithubId)
     .single();
 
-  if (error || !data) {
+  if (error || data === null || data === undefined) {
     return null;
   }
 
