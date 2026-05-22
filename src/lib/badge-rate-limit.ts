@@ -19,6 +19,11 @@ function pruneBuckets(now: number) {
   }
 }
 
+/**
+ * Checks if the given IP is within rate limits for badge generation.
+ * @param ip - Client IP address
+ * @returns BadgeRateLimitResult indicating if request is allowed
+ */
 export function checkBadgeRateLimit(ip: string): BadgeRateLimitResult {
   const now = Date.now();
   pruneBuckets(now);
@@ -38,6 +43,11 @@ export function checkBadgeRateLimit(ip: string): BadgeRateLimitResult {
   return { allowed: true, remaining: BADGE_LIMIT - active.length, reset };
 }
 
+/**
+ * Extracts the client IP from a NextRequest for rate limiting.
+ * @param req - NextRequest object
+ * @returns Client IP address string
+ */
 export function getBadgeClientIp(req: NextRequest): string {
   return (
     req.ip ??
