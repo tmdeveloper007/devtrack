@@ -43,12 +43,23 @@ function scoreDaysSinceLastCommit(days: number): number {
   return clamp(normalized, 0, 1) * 15;
 }
 
+/**
+ * Determines the health grade based on the composite score.
+ * @param score - Numeric score from 0-100
+ * @returns Grade string: 'green' (70+), 'yellow' (40-69), or 'red' (<40)
+ */
 function gradeForScore(score: number): RepoHealthScore["grade"] {
   if (score >= 70) return "green";
   if (score >= 40) return "yellow";
   return "red";
 }
 
+/**
+ * Computes the overall health score for a repository based on various signals.
+ * @param repo - Repository full name (owner/repo)
+ * @param signals - RepoHealthSignals containing repository metrics
+ * @returns RepoHealthScore with score, grade, and signals
+ */
 export function computeHealthScore(
   repo: string,
   signals: RepoHealthSignals
