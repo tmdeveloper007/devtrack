@@ -4,6 +4,12 @@ export interface AppUser {
   id: string;
 }
 
+/**
+ * Resolves a GitHub user to an app user, creating one if they don't exist.
+ * @param githubId - The GitHub user ID
+ * @param githubLogin - Optional GitHub username
+ * @returns Promise resolving to AppUser or null if operation failed
+ */
 export async function resolveAppUser(
   githubId: string,
   githubLogin?: string
