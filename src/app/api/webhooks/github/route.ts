@@ -1,8 +1,9 @@
-import { createHmac, timingSafeEqual } from "crypto";
+import { createHmac } from "crypto";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { logError } from "@/lib/error-handler";
+import { safeCompare } from "@/lib/crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -23,22 +24,11 @@ interface GitHubPushPayload {
   };
 }
 
-function getExpectedSignature(secret: string, body: string): string {
+export function getExpectedSignature(secret: string, body: string): string {
   return `sha256=${createHmac("sha256", secret).update(body).digest("hex")}`;
 }
 
-function safeCompare(a: string, b: string): boolean {
-  const left = Buffer.from(a, "utf8");
-  const right = Buffer.from(b, "utf8");
-
-  if (left.length !== right.length) {
-    return false;
-  }
-
-  return timingSafeEqual(left, right); // timingSafeEqual prevents timing attack vulnerabilities
-}
-
-function verifyGitHubSignature(
+export function verifyGitHubSignature(
   body: string,
   signature: string | null,
   secret: string
