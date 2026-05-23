@@ -32,6 +32,9 @@ function getRateLimitKey(req: NextRequest): string {
 
 function checkRateLimit(ip: string): { allowed: boolean; retryAfter?: number } {
   const now = Date.now();
+  for (const [key, record] of ipRateLimits) {
+    if (now > record.resetAt) ipRateLimits.delete(key);
+  }
   const record = ipRateLimits.get(ip);
 
   if (!record || now > record.resetAt) {
