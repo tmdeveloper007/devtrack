@@ -49,8 +49,8 @@ function safeUnit(unit: unknown): string {
 }
 
 function safeRecurrence(recurrence: unknown): string {
-  return VALID_RECURRENCES.includes(recurrence as string)
-    ? (recurrence as string)
+  return VALID_RECURRENCES.includes(recurrence as typeof VALID_RECURRENCES[number])
+    ? (recurrence as typeof VALID_RECURRENCES[number])
     : "none";
 }
 
