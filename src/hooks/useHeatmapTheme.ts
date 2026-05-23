@@ -186,6 +186,5 @@ export function useHeatmapTheme() {
     themeConfig,
     getHeatmapStyle,
     getCalendarStyle,
-    suppressHydrationMismatch: !mounted,
   };
 }
