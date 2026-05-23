@@ -77,6 +77,13 @@ export async function POST() {
     .eq("freeze_date", today)
     .maybeSingle();
 
+  if (existing) {
+    return Response.json(
+      { error: "You already have an unused streak freeze." },
+      { status: 409 }
+    );
+  }
+
   const { data: freeze, error } = await supabaseAdmin
     .from("streak_freezes")
     .upsert({ user_id: user.id, freeze_date: today }, { onConflict: "user_id,freeze_date" })
@@ -87,9 +94,7 @@ export async function POST() {
     return Response.json({ error: "Failed to apply freeze." }, { status: 500 });
   }
 
-  const alreadyExisted = existing !== null;
-
-  return Response.json({ freeze, already_existed: alreadyExisted }, { status: 201 });
+  return Response.json({ freeze }, { status: 201 });
 }
 
 // DELETE /api/streak/freeze
