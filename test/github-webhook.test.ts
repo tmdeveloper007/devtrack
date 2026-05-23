@@ -80,7 +80,7 @@ describe('webhook signature verification', () => {
     });
 
     it('returns false for undefined signature', () => {
-      expect(verifyGitHubSignature(body, undefined, secret)).toBe(false);
+      expect(verifyGitHubSignature(body, null, secret)).toBe(false);
     });
 
     it('returns false for empty string signature', () => {
