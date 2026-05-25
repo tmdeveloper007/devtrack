@@ -80,7 +80,7 @@ function capitalize(value: string): string {
     : "Updated";
 }
 
-function formatActivity(event: RawEvent): ActivityItem | null {
+export function formatActivity(event: RawEvent): ActivityItem | null {
   const repoName = event.repo?.name;
 
   if (!repoName || !SUPPORTED_EVENT_TYPES.has(event.type)) {
