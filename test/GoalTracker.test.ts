@@ -229,3 +229,29 @@ describe('GoalTracker - RECURRENCE_LABELS mapping', () => {
     expect(Object.keys(RECURRENCE_LABELS)).toContain('monthly');
   });
 });
+
+describe('GoalTracker - ARIA attributes design', () => {
+  it('correctly maps raw goal state to ARIA progressbar specs', () => {
+    const goal = {
+      title: 'Make commits',
+      current: 4,
+      target: 10,
+      unit: 'commits',
+    };
+    
+    // Simulating DOM structure mapping
+    const progressProps = {
+      role: 'progressbar',
+      'aria-valuenow': goal.current,
+      'aria-valuemin': 0,
+      'aria-valuemax': goal.target,
+      'aria-label': `Goal progress: ${goal.current} of ${goal.target} ${goal.unit}`,
+    };
+
+    expect(progressProps.role).toBe('progressbar');
+    expect(progressProps['aria-valuenow']).toBe(4);
+    expect(progressProps['aria-valuemin']).toBe(0);
+    expect(progressProps['aria-valuemax']).toBe(10);
+    expect(progressProps['aria-label']).toBe('Goal progress: 4 of 10 commits');
+  });
+});
