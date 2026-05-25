@@ -7,8 +7,7 @@ vi.mock("@/lib/supabase", () => ({
   },
 }));
 
-import { safeCompare } from "@/lib/crypto";
-import { getExpectedSignature, verifyGitHubSignature } from "@/app/api/webhooks/github/route";
+import { safeCompare, getExpectedSignature, verifyGitHubSignature } from "@/lib/crypto";
 
 describe("webhook signature verification", () => {
   describe("safeCompare", () => {

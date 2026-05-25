@@ -3,6 +3,7 @@ import {
   createDecipheriv,
   randomBytes,
   timingSafeEqual,
+  createHmac,
 } from "crypto";
 
 const ALGORITHM = "aes-256-gcm";
@@ -120,4 +121,21 @@ export function safeCompare(a: string, b: string): boolean {
 
   return timingSafeEqual(left, right);
 }
+
+export function getExpectedSignature(secret: string, body: string): string {
+  return `sha256=${createHmac("sha256", secret).update(body).digest("hex")}`;
+}
+
+export function verifyGitHubSignature(
+  body: string,
+  signature: string | null,
+  secret: string
+): boolean {
+  if (!signature?.startsWith("sha256=")) {
+    return false;
+  }
+
+  return safeCompare(signature, getExpectedSignature(secret, body));
+}
+
 

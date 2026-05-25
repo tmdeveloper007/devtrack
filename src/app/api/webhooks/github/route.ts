@@ -1,9 +1,8 @@
-import { createHmac } from "crypto";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { logError } from "@/lib/error-handler";
-import { safeCompare } from "@/lib/crypto";
+import { verifyGitHubSignature } from "@/lib/crypto";
 
 export const dynamic = "force-dynamic";
 
@@ -22,22 +21,6 @@ interface GitHubPushPayload {
   sender?: {
     login?: string;
   };
-}
-
-export function getExpectedSignature(secret: string, body: string): string {
-  return `sha256=${createHmac("sha256", secret).update(body).digest("hex")}`;
-}
-
-export function verifyGitHubSignature(
-  body: string,
-  signature: string | null,
-  secret: string
-): boolean {
-  if (!signature?.startsWith("sha256=")) {
-    return false;
-  }
-
-  return safeCompare(signature, getExpectedSignature(secret, body));
 }
 
 function getPushActor(payload: GitHubPushPayload): string | null {
