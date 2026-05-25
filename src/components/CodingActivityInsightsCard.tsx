@@ -26,18 +26,28 @@ function formatCommitCount(count: number): string {
 function InsightRow({
   label,
   value,
+  dotColor,
 }: {
   label: string;
   value: string;
+  dotColor?: string;
 }) {
   return (
     <div className="rounded-lg bg-[var(--control)] px-3 py-2">
       <p className="text-xs font-medium uppercase tracking-wide text-[var(--muted-foreground)]">
         {label}
       </p>
-      <p className="mt-1 text-sm font-medium text-[var(--card-foreground)]">
-        {value}
-      </p>
+      <div className="mt-1 flex items-center gap-1.5">
+        {dotColor && (
+          <span
+            className={`h-2.5 w-2.5 rounded-full shrink-0 ${dotColor}`}
+            aria-hidden="true"
+          />
+        )}
+        <p className="text-sm font-medium text-[var(--card-foreground)]">
+          {value}
+        </p>
+      </div>
     </div>
   );
 }
@@ -174,6 +184,18 @@ export default function CodingActivityInsightsCard() {
       return [];
     }
 
+    const productivityValue = data.productivityLevel || "Low";
+    const productivityDot =
+      data.productivityLevel === "Excellent"
+        ? "bg-emerald-500"
+        : data.productivityLevel === "Very Good"
+          ? "bg-blue-500"
+          : data.productivityLevel === "Good"
+            ? "bg-yellow-500"
+            : data.productivityLevel === "Moderate"
+              ? "bg-orange-500"
+              : "bg-red-500";
+
     const rows = [
       {
         label: "Most active",
@@ -187,21 +209,11 @@ export default function CodingActivityInsightsCard() {
         label: "Consistency",
         value: `${data.consistencyScore ?? 0}% weekly consistency`,
       },
-
       {
-          label: "Productivity",
-          value:
-            data.productivityLevel === "Excellent"
-              ? "🟢 Excellent"
-              : data.productivityLevel === "Very Good"
-                ? "🔵 Very Good"
-                : data.productivityLevel === "Good"
-                  ? "🟡 Good"
-                  : data.productivityLevel === "Moderate"
-                    ? "🟠 Moderate"
-                    : "🔴 Low",
-        },
-
+        label: "Productivity",
+        value: productivityValue,
+        dotColor: productivityDot,
+      },
       {
         label: "Daily Average",
         value: `${data.averageDailyCommits ?? 0} commits/day`,
@@ -342,6 +354,7 @@ export default function CodingActivityInsightsCard() {
           key={row.label}
           label={row.label}
           value={row.value}
+          dotColor={row.dotColor}
         />
       ))}
     </div>
