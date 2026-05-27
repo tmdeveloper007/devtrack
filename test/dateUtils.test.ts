@@ -137,4 +137,42 @@ describe("getLastWeekRange", () => {
     expect(range.start).toBe(expectedStart);
     expect(range.end).toBe(expectedEnd);
   });
+
+  it("should handle UTC midnight boundary transition", () => {
+    // Test exactly at UTC midnight
+    const mockMidnight = new Date("2024-04-15T00:00:00Z"); // Monday midnight
+    vi.useFakeTimers();
+    vi.setSystemTime(mockMidnight);
+
+    const range = getThisWeekRange();
+
+    expect(range.start).toBe(new Date(Date.UTC(2024, 3, 15, 0, 0, 0, 0)).toISOString());
+    expect(range.end).toBe(new Date(Date.UTC(2024, 3, 15, 23, 59, 59, 0)).toISOString());
+  });
+
+  it("should handle last day of month boundaries", () => {
+    // April 30, 2024 is a Tuesday
+    const mockEndOfMonth = new Date("2024-04-30T14:00:00Z");
+    vi.useFakeTimers();
+    vi.setSystemTime(mockEndOfMonth);
+
+    const range = getThisWeekRange();
+
+    // Monday was April 29
+    expect(range.start).toBe(new Date(Date.UTC(2024, 3, 29, 0, 0, 0, 0)).toISOString());
+    expect(range.end).toBe(new Date(Date.UTC(2024, 3, 30, 23, 59, 59, 0)).toISOString());
+  });
+
+  it("should handle last week spanning year boundary", () => {
+    // Jan 2, 2025 is a Thursday - last week of 2024
+    const mockYearStart = new Date("2025-01-02T10:00:00Z");
+    vi.useFakeTimers();
+    vi.setSystemTime(mockYearStart);
+
+    const range = getLastWeekRange();
+
+    // Previous week: Monday 2024-12-23, Sunday 2024-12-29
+    expect(range.start).toBe(new Date(Date.UTC(2024, 11, 23, 0, 0, 0, 0)).toISOString());
+    expect(range.end).toBe(new Date(Date.UTC(2024, 11, 29, 23, 59, 59, 0)).toISOString());
+  });
 });
