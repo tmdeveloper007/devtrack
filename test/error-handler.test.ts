@@ -14,7 +14,7 @@ describe("error-handler", () => {
 
   it("should log error message and context in production mode", () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "production";
+    (process.env as any).NODE_ENV = "production";
 
     try {
       const error = new Error("Test db timeout");
@@ -34,13 +34,13 @@ describe("error-handler", () => {
       expect(parsed.error).toBe("Test db timeout");
       expect(parsed.stack).toBeUndefined(); // Should be omitted in production
     } finally {
-      process.env.NODE_ENV = originalEnv;
+      (process.env as any).NODE_ENV = originalEnv;
     }
   });
 
   it("should log error stack in development mode", () => {
     const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = "development";
+    (process.env as any).NODE_ENV = "development";
 
     try {
       const error = new Error("Dev mode failure");
@@ -56,7 +56,7 @@ describe("error-handler", () => {
       expect(logEntry.stack).toBeDefined();
       expect(logEntry.source).toBe("test");
     } finally {
-      process.env.NODE_ENV = originalEnv;
+      (process.env as any).NODE_ENV = originalEnv;
     }
   });
 });
