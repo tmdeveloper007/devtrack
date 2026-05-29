@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from 'react';
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    PUBLIC TYPES
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 export type RepoStats = {
   stars: number;
   forks: number;
@@ -14,13 +14,13 @@ export type RepoStats = {
   contributors: Array<{ login: string; avatar_url: string; html_url: string }>;
 };
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    CONSTANTS
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 const A = '#818cf8';                  // accent — indigo
 const BG = 'transparent'
 const SURF = '#0e0e0e';
-const BORDER = '#1a1a1a';
+const BORDER = '#2a2a2a';             // was #1a1a1a — now more visible
 const TEXT = '#e0e0e0';
 const MUTED = '#94a3b8';
 const HC = ['#111', '#1e1b4b', '#3730a3', '#4f46e5', A]; // heatmap levels
@@ -29,9 +29,9 @@ const MC = ['#111', '#1e1b4b', '#3730a3', A];             // mini heatmap
 const MONO = 'var(--font-jetbrains, ui-monospace, monospace)';
 const DISP = 'var(--font-syne, system-ui, sans-serif)';
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    PRE-SEEDED DATA  (deterministic → no hydration mismatch)
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function heatLvl(i: number): 0 | 1 | 2 | 3 | 4 {
   const d = i % 7;
   const w = Math.floor(i / 7);
@@ -61,9 +61,9 @@ const COMMITS = [
   'feat(leaderboard): weekly ranking system',
 ];
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    HOOKS
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function useScrollReveal(threshold = 0.15) {
   const ref = useRef<HTMLDivElement>(null);
   const [vis, setVis] = useState(false);
@@ -100,9 +100,9 @@ function Counter({ end, active }: { end: number; active: boolean }) {
   return <>{val.toLocaleString()}</>;
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    MOUSE SPOTLIGHT
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function MouseSpotlight() {
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -130,9 +130,9 @@ function MouseSpotlight() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    NAV
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function LandingNav() {
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
@@ -163,9 +163,9 @@ function LandingNav() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    BENTO WIDGETS
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 const wLabel: React.CSSProperties = {
   fontFamily: MONO, fontSize: 10, fontWeight: 500,
   color: '#444', textTransform: 'uppercase', letterSpacing: '0.1em',
@@ -348,9 +348,9 @@ function BentoGrid() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    HERO
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function HeroSection() {
   return (
     <section
@@ -391,9 +391,9 @@ function HeroSection() {
           <span style={{ color: '#222' }}>.</span>
         </h1>
 
-        {/* Tagline */}
+        {/* Tagline — NOW HIGH CONTRAST */}
         <p style={{
-          fontSize: 'clamp(15px,1.8vw,17px)', color: MUTED,
+          fontSize: 'clamp(15px,1.8vw,17px)', color: MUTED,   // was #555
           lineHeight: 1.65, maxWidth: 400, margin: '0 0 32px',
         }}>
           Open-source developer productivity dashboard. Track GitHub streaks,
@@ -427,9 +427,9 @@ function HeroSection() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    COMMIT TICKER
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function CommitTicker() {
   const doubled = [...COMMITS, ...COMMITS];
   return (
@@ -455,9 +455,9 @@ function CommitTicker() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    HEATMAP SECTION
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function HeatmapSection() {
   const [ref, vis] = useScrollReveal(0.05);
   return (
@@ -497,9 +497,9 @@ function HeatmapSection() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    STATS ROW
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 const STATS = [
   { value: 847, label: 'COMMITS TRACKED' },
   { value: 43,  label: 'PRS MERGED' },
@@ -547,9 +547,9 @@ function StatsSection() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    FEATURES LIST
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 const FEATURES = [
   {
     num: '01', title: 'STREAK TRACKING',
@@ -601,7 +601,7 @@ function FeatureItem({ f, index }: { f: typeof FEATURES[0]; index: number }) {
         }}>
           {f.title}
         </h3>
-        <p style={{ fontSize: 14, color: '#444', lineHeight: 1.65, margin: 0 }}>
+        <p style={{ fontSize: 14, color: MUTED, lineHeight: 1.65, margin: 0 }}>   {/* was '#444' */}
           {f.desc}
         </p>
       </div>
@@ -626,9 +626,9 @@ function FeaturesSection() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    SETUP SECTION
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function SetupSection() {
   const [ref, vis] = useScrollReveal(0.2);
   return (
@@ -669,7 +669,7 @@ function SetupSection() {
           <span style={{ color: A }}>$</span> git clone github.com/…/devtrack
         </div>
         <div style={{ color: TEXT }}>
-          <span style={{ color: A }}>$</span> npm install &amp;&amp; npm run dev
+          <span style={{ color: A }}>$</span> npm install && npm run dev
         </div>
       </div>
 
@@ -694,9 +694,9 @@ function SetupSection() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    OPEN SOURCE / CONTRIBUTE SECTION
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function ContributeSection({ stats }: { stats: RepoStats }) {
   const [ref, vis] = useScrollReveal(0.08);
 
@@ -759,7 +759,7 @@ function ContributeSection({ stats }: { stats: RepoStats }) {
           BUILT IN PUBLIC.<br />
           <span style={{ color: A }}>SHIP WITH US.</span>
         </h2>
-        <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.7, margin: 0 }}>
+        <p style={{ fontSize: 16, color: MUTED, lineHeight: 1.7, margin: 0 }}>   {/* was '#555' */}
           DevTrack is fully open source — MIT licensed, self-hostable, and built by developers
           who actually use it. Every widget, every metric, every API was contributed by
           someone in this list. {stats.goodFirstIssues > 0 && (
@@ -856,15 +856,15 @@ function ContributeSection({ stats }: { stats: RepoStats }) {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    LANDING FOOTER  (above global Footer)
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 function LandingFooter() {
   return (
     <footer 
       data-testid="landing-footer"
       style={{
-        borderTop: `1px solid #111`,
+        borderTop: `1px solid ${BORDER}`,   // was '#111'
         padding: '24px clamp(20px,4vw,48px)',
         display: 'flex', flexWrap: 'wrap', gap: '8px 32px',
         justifyContent: 'space-between', alignItems: 'center',
@@ -888,9 +888,9 @@ function LandingFooter() {
   );
 }
 
-/* ═══════════════════════════════════════════
+/* ═══════════════════════════════════════════════════════════
    MAIN EXPORT
-   ═══════════════════════════════════════════ */
+   ═══════════════════════════════════════════════════════════ */
 export default function LandingPage({ repoStats }: { repoStats: RepoStats }) {
   return (
     <div
