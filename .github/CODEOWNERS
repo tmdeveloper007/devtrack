@@ -1,0 +1,10 @@
+# Global owner — reviews required on all PRs
+* @Priyanshu-byte-coder
+
+# Auth and database — extra scrutiny
+/src/lib/auth.ts @Priyanshu-byte-coder
+/src/lib/supabase.ts @Priyanshu-byte-coder
+/supabase/ @Priyanshu-byte-coder
+
+# CI / workflows
+/.github/workflows/ @Priyanshu-byte-coder

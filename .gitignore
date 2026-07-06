@@ -1,0 +1,66 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+.next/
+out/
+*.tsbuildinfo
+
+# Environment files — NEVER commit these
+.env
+.env.local
+.env.local*
+.env.production
+.env.*.local
+
+# Next.js
+next-env.d.ts
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Claude Code local settings
+.claude/
+
+desktop.ini
+
+test-results/
+
+.vercel
+.env*
+
+# PWA artifacts
+public/sw.js
+public/sw.js.map
+public/workbox-*.js
+public/workbox-*.js.map
+public/fallback-*.js
+public/worker-*.js
+public/swe-worker-*.js
+worker/
+
+# temp test artifacts
+server-output.txt
+test-ssr.mjs
+
+# dev artifacts — prevent accidental commits of scratch files and patches
+*.patch
+temp.*
+upstream-*.ts
+screenshot.png
+
+# Prevent npm lockfile conflicts
+package-lock.json
