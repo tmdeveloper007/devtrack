@@ -98,7 +98,7 @@ export function analyzePatterns(metrics: DeveloperMetrics): Insight[] {
     insights.push({
       id: "streak-milestone",
       type: "milestone",
-      title: `${metrics.streak.current}-day coding streak 🔥`,
+      title: `${metrics.streak.current}-day coding streak`,
       description: `You've been coding every day for ${metrics.streak.current} days. Keep the momentum — streaks build habits.`,
       severity: "positive",
     });
