@@ -49,6 +49,40 @@ describe("csvCell", () => {
   });
 });
 
+describe("csvCell formula-injection protection", () => {
+  it("prefixes value starting with = with single-quote", () => {
+    expect(csvCell("=HYPERLINK(\"http://evil.com\")")).toBe("'\"=HYPERLINK(\\\"http://evil.com\\\")\"");
+  });
+
+  it("prefixes value starting with + with single-quote", () => {
+    expect(csvCell("+malicious")).toBe("'+malicious");
+  });
+
+  it("prefixes value starting with - with single-quote", () => {
+    expect(csvCell("-formula")).toBe("'-formula");
+  });
+
+  it("prefixes value starting with @ with single-quote", () => {
+    expect(csvCell("@foo")).toBe("'@foo");
+  });
+
+  it("prefixes value starting with tab with single-quote", () => {
+    expect(csvCell("\tvalue")).toBe("'\tvalue");
+  });
+
+  it("prefixes value starting with carriage return with single-quote", () => {
+    expect(csvCell("\rvalue")).toBe("'\rvalue");
+  });
+
+  it("still wraps formula-prefixed value with double-quotes when it also contains a comma", () => {
+    expect(csvCell("=foo,bar")).toBe("'\"=foo,bar\"");
+  });
+
+  it("does not double-prefix already single-quoted string", () => {
+    expect(csvCell("'already-prefixed")).toBe("''already-prefixed");
+  });
+});
+
 describe("toCsv", () => {
   it("returns empty string for empty array", () => {
     expect(toCsv([])).toBe("");
@@ -108,5 +142,31 @@ describe("toCsv", () => {
     const rows = [{ n: 42, b: true }];
     const result = toCsv(rows);
     expect(result).toBe("n,b\n42,true");
+  });
+
+  it("sanitises formula-injection values in toCsv output", () => {
+    const rows = [
+      { url: "https://example.com", formula: "=HYPERLINK(\"http://evil.com\")" },
+      { url: "https://safe.com", formula: "+malicious" },
+    ];
+    const result = toCsv(rows);
+    const lines = result.split("\n");
+    expect(lines[1]).toBe("https://example.com,\"'\"=HYPERLINK(\\\"http://evil.com\\\")\"\"");
+    expect(lines[2]).toBe("https://safe.com,'+malicious");
+  });
+
+  it("handles mixed formula-injection and standard escaping in same row", () => {
+    const rows = [
+      { cell: "=formula" },      // formula injection
+      { cell: "plain" },          // safe
+      { cell: "has, comma" },     // needs quoting
+      { cell: "has\"quote\"" }, // needs escaping
+    ];
+    const result = toCsv(rows);
+    const lines = result.split("\n");
+    expect(lines[1]).toBe("'\"=formula\"");
+    expect(lines[2]).toBe("plain");
+    expect(lines[3]).toBe('"has, comma"');
+    expect(lines[4]).toBe('"has ""quote"""');
   });
 });
