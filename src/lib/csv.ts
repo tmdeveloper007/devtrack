@@ -7,16 +7,25 @@
  *   - Any double-quote inside a value is escaped by doubling it ("").
  *   - null / undefined render as an empty cell.
  *   - Numbers and booleans are coerced to string without quoting.
+ *   - Values starting with formula-injection characters (=+-\t\r@) are
+ *     prefixed with a single-quote to prevent CSV/Excel formula injection.
  */
 
-/** Escape and optionally quote a single CSV cell value. */
+/** Characters that trigger formula interpretation in spreadsheets. */
+const FORMULA_PREFIX_CHARS = /^[=+\-@\t\r]/;
+
+/** Escape and optionally quote a single CSV cell value.
+ *  Cells starting with formula-injection characters are prefixed
+ *  with a single-quote to force spreadsheet text rendering. */
 export function csvCell(value: unknown): string {
   if (value === null || value === undefined) return "";
   const str = String(value);
-  if (/[,"\n\r]/.test(str)) {
-    return `"${str.replace(/"/g, '""')}"`;
+  // Prefix with single-quote to neutralise formula-injection characters
+  const safe = FORMULA_PREFIX_CHARS.test(str) ? "'" + str : str;
+  if (/[,"\n\r]/.test(safe)) {
+    return `"${safe.replace(/"/g, '""')}"`;
   }
-  return str;
+  return safe;
 }
 
 /**

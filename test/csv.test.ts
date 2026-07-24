@@ -49,6 +49,40 @@ describe("csvCell", () => {
   });
 });
 
+describe("csvCell formula-injection protection", () => {
+  it("prefixes value starting with = with single-quote", () => {
+    expect(csvCell("=HYPERLINK(\"http://evil.com\")")).toBe("'=HYPERLINK(\"http://evil.com\")");
+  });
+
+  it("prefixes value starting with + with single-quote", () => {
+    expect(csvCell("+malicious")).toBe("'+malicious");
+  });
+
+  it("prefixes value starting with - with single-quote", () => {
+    expect(csvCell("-formula")).toBe("'-formula");
+  });
+
+  it("prefixes value starting with @ with single-quote", () => {
+    expect(csvCell("@foo")).toBe("'@foo");
+  });
+
+  it("prefixes value starting with tab with single-quote", () => {
+    expect(csvCell("\tvalue")).toBe("'\tvalue");
+  });
+
+  it("prefixes value starting with carriage return with single-quote", () => {
+    expect(csvCell("\rvalue")).toBe("'\rvalue");
+  });
+
+  it("still wraps formula-prefixed value with double-quotes when it also contains a comma", () => {
+    expect(csvCell("=foo,bar")).toBe("'\"=foo,bar\"");
+  });
+
+  it("does not double-prefix already single-quoted string", () => {
+    expect(csvCell("'already-prefixed")).toBe("''already-prefixed");
+  });
+});
+
 describe("toCsv", () => {
   it("returns empty string for empty array", () => {
     expect(toCsv([])).toBe("");
