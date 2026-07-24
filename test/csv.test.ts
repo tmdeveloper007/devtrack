@@ -143,4 +143,30 @@ describe("toCsv", () => {
     const result = toCsv(rows);
     expect(result).toBe("n,b\n42,true");
   });
+
+  it("sanitises formula-injection values in toCsv output", () => {
+    const rows = [
+      { url: "https://example.com", formula: "=HYPERLINK(\"http://evil.com\")" },
+      { url: "https://safe.com", formula: "+malicious" },
+    ];
+    const result = toCsv(rows);
+    const lines = result.split("\n");
+    expect(lines[1]).toBe("https://example.com,\"'\"=HYPERLINK(\\\"http://evil.com\\\")\"\"");
+    expect(lines[2]).toBe("https://safe.com,'+malicious");
+  });
+
+  it("handles mixed formula-injection and standard escaping in same row", () => {
+    const rows = [
+      { cell: "=formula" },
+      { cell: "plain" },
+      { cell: "has, comma" },
+      { cell: 'has"quote"' },
+    ];
+    const result = toCsv(rows);
+    const lines = result.split("\n");
+    expect(lines[1]).toBe("'\"=formula\"");
+    expect(lines[2]).toBe("plain");
+    expect(lines[3]).toBe('"has, comma"');
+    expect(lines[4]).toBe('"has ""quote"""');
+  });
 });
