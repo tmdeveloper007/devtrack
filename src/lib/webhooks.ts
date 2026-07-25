@@ -2,6 +2,19 @@ import { createHmac, randomBytes } from "crypto";
 import { supabaseAdmin } from "./supabase";
 import { encryptToken, decryptToken } from "./crypto";
 
+const WEBHOOK_TIMEOUT_MS = 10_000;
+const WEBHOOK_MAX_RETRIES = 3;
+const WEBHOOK_BACKOFF_BASE_MS = 1_000;
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function isRetryableFailure(statusCode: number): boolean {
+  // Retry on 5xx server errors.
+  return statusCode >= 500;
+}
+
 export interface WebhookPayload {
   event: string;
   timestamp: string;
@@ -96,62 +109,109 @@ export async function dispatchWebhook(
   let statusCode: number | undefined;
   let errorMessage: string | undefined;
 
-  try {
-    const response = await fetch(webhook.url, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "X-Webhook-Signature": `sha256=${signature}`,
-    "X-Webhook-Event": event,
-    "X-Webhook-Delivery-Id": webhookId,
-  },
-  body: payloadString,
-  signal: AbortSignal.timeout(10000),
-  redirect: "manual",
-});
+  for (let attempt = 1; attempt <= WEBHOOK_MAX_RETRIES; attempt++) {
+    let response: Response | null = null;
 
-if ([301, 302, 303, 307, 308].includes(response.status)) {
-  const location = response.headers.get("location");
+    try {
+      response = await fetch(webhook.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Webhook-Signature": `sha256=${signature}`,
+          "X-Webhook-Event": event,
+          "X-Webhook-Delivery-Id": webhookId,
+        },
+        body: payloadString,
+        signal: AbortSignal.timeout(WEBHOOK_TIMEOUT_MS),
+        redirect: "manual",
+      });
 
-  if (!location) {
-    throw new Error("Redirect response missing location header");
+      if ([301, 302, 303, 307, 308].includes(response.status)) {
+        const location = response.headers.get("location");
+
+        if (!location) {
+          throw new Error("Redirect response missing location header");
+        }
+
+        const { isSafeUrl } = await import("./ssrf-protection");
+        const redirectSafe = await isSafeUrl(location);
+
+        if (!redirectSafe) {
+          throw new Error(
+            "SSRF protection: blocked redirect to private/internal address"
+          );
+        }
+      }
+
+      statusCode = response.status;
+
+      if (response.ok) {
+        await supabaseAdmin.from("webhook_deliveries").insert({
+          webhook_id: webhookId,
+          event,
+          payload,
+          status_code: statusCode,
+          success: true,
+          error_message: null,
+        });
+        return { success: true, statusCode };
+      }
+
+      // Non-ok response: check if retryable
+      if (!isRetryableFailure(response.status) || attempt === WEBHOOK_MAX_RETRIES) {
+        errorMessage = `HTTP ${statusCode}`;
+        await supabaseAdmin.from("webhook_deliveries").insert({
+          webhook_id: webhookId,
+          event,
+          payload,
+          status_code: statusCode,
+          success: false,
+          error_message: errorMessage,
+        });
+        return { success: false, statusCode, error: errorMessage };
+      }
+
+      // Retryable: log attempt and back off
+      console.warn(
+        `[webhooks] Delivery attempt ${attempt} failed for webhook ${webhookId}: HTTP ${statusCode}. Retrying...`
+      );
+      if (attempt < WEBHOOK_MAX_RETRIES) {
+        const delay = WEBHOOK_BACKOFF_BASE_MS * Math.pow(2, attempt - 1);
+        await sleep(delay);
+      }
+    } catch (err) {
+      errorMessage = err instanceof Error ? err.message : "Unknown error";
+
+      if (attempt === WEBHOOK_MAX_RETRIES) {
+        await supabaseAdmin.from("webhook_deliveries").insert({
+          webhook_id: webhookId,
+          event,
+          payload,
+          success: false,
+          error_message: errorMessage,
+        });
+        return { success: false, statusCode, error: errorMessage };
+      }
+
+      console.warn(
+        `[webhooks] Delivery attempt ${attempt} failed for webhook ${webhookId}: ${errorMessage}. Retrying...`
+      );
+      if (attempt < WEBHOOK_MAX_RETRIES) {
+        const delay = WEBHOOK_BACKOFF_BASE_MS * Math.pow(2, attempt - 1);
+        await sleep(delay);
+      }
+    }
   }
 
-  const redirectSafe = await isSafeUrl(location);
-
-  if (!redirectSafe) {
-    throw new Error(
-      "SSRF protection: blocked redirect to private/internal address"
-    );
-  }
-}
-
-    statusCode = response.status;
-    const success = response.ok;
-
-    await supabaseAdmin.from("webhook_deliveries").insert({
-      webhook_id: webhookId,
-      event,
-      payload,
-      status_code: statusCode,
-      success,
-      error_message: success ? null : `HTTP ${statusCode}`,
-    });
-
-    return { success, statusCode };
-  } catch (err) {
-    errorMessage = err instanceof Error ? err.message : "Unknown error";
-
-    await supabaseAdmin.from("webhook_deliveries").insert({
-      webhook_id: webhookId,
-      event,
-      payload,
-      success: false,
-      error_message: errorMessage,
-    });
-
-    return { success: false, error: errorMessage };
-  }
+  // All retries exhausted (fallback, should not reach here)
+  await supabaseAdmin.from("webhook_deliveries").insert({
+    webhook_id: webhookId,
+    event,
+    payload,
+    success: false,
+    error_message: errorMessage ?? "Max retries exceeded",
+  });
+  return { success: false, statusCode, error: errorMessage ?? "Max retries exceeded" };
 }
 
 export async function dispatchToAllWebhooks(
