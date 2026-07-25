@@ -148,12 +148,14 @@ export default function CustomCursor() {
           transform: "translate3d(-100px, -100px, 0)",
           boxShadow: "0 0 10px #00f0ff, 0 0 20px #00f0ff",
           transition: "opacity 0.25s ease-out, width 0.2s, height 0.2s, background-color 0.2s",
-          ...(isHovered && {
-            width: 5,
-            height: 5,
-            backgroundColor: "#ffffff",
-            boxShadow: "0 0 8px #ffffff",
-          }),
+          ...(isHovered
+            ? {
+                width: 5,
+                height: 5,
+                backgroundColor: "#ffffff",
+                boxShadow: "0 0 8px #ffffff",
+              }
+            : {}),
         }}
       />
 
@@ -176,14 +178,16 @@ export default function CustomCursor() {
           transform: "translate3d(-100px, -100px, 0)",
           boxShadow: "0 0 8px rgba(0, 240, 255, 0.4)",
           transition: "opacity 0.25s ease-out, border-color 0.2s, width 0.25s, height 0.25s, box-shadow 0.25s, margin 0.25s",
-          ...(isHovered && {
-            width: 48,
-            height: 48,
-            borderColor: "#ffffff",
-            boxShadow: "0 0 16px rgba(255, 255, 255, 0.55)",
-            marginLeft: -8, // offsets the larger width (48px vs 32px -> 16px diff -> 8px margin shift)
-            marginTop: -8,
-          }),
+          ...(isHovered
+            ? {
+                width: 48,
+                height: 48,
+                borderColor: "#ffffff",
+                boxShadow: "0 0 16px rgba(255, 255, 255, 0.55)",
+                marginLeft: -8,
+                marginTop: -8,
+              }
+            : {}),
         }}
       />
     </>
