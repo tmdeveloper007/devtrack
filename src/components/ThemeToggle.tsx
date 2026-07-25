@@ -59,9 +59,28 @@ function CompactThemeToggle() {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const themeRef = useRef(theme);
+  const setThemeRef = useRef(setTheme);
+  themeRef.current = theme;
+  setThemeRef.current = setTheme;
 
   useEffect(() => {
     setMounted(true);
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        const current = themeRef.current;
+        const setter = setThemeRef.current;
+        const opts = THEME_OPTIONS;
+        const idx = opts.findIndex((o) => o.id === current);
+        const next = opts[(idx + 1) % opts.length];
+        setter(next.id);
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
   }, []);
 
   useEffect(() => {
