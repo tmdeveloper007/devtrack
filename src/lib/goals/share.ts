@@ -17,5 +17,5 @@ export function buildPublicGoalShareUrl(
   username: string,
   goalId: string
 ) {
-  return `${origin}${buildPublicGoalSharePath(username, goalId)}`;
+  return `${origin.replace(/\/+$/, '')}${buildPublicGoalSharePath(username, goalId)}`;
 }
