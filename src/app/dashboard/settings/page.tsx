@@ -410,7 +410,7 @@ function SettingsPageContent() {
   useEffect(() => {
     if (status !== "authenticated") return;
     setLoadingRepos(true);
-    fetch("/api/metrics/repos?days=90")
+    fetch("/api/metrics/repos-list")
       .then((r) => r.json())
       .then((d) => {
         const names = (d.repos ?? []).map((r: any) => r.name);
