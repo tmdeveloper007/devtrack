@@ -184,29 +184,27 @@ export async function GET(request: Request) {
   const cookie = request.headers.get("cookie") ?? "";
   const headers = { Cookie: cookie };
 
-  const [contributionsRaw, prsRaw, streakRaw, reposRaw]: [
-    ContributionsApiResponse,
-    PRsApiResponse,
-    StreakApiResponse,
-    ReposApiResponse,
-  ] = await Promise.all([
-    fetchJsonOrEmpty<ContributionsApiResponse>(
-      `${baseUrl}/api/metrics/contributions?days=90`,
-      headers
-    ),
-    fetchJsonOrEmpty<PRsApiResponse>(
-      `${baseUrl}/api/metrics/prs`,
-      headers
-    ),
-    fetchJsonOrEmpty<StreakApiResponse>(
-      `${baseUrl}/api/metrics/streak`,
-      headers
-    ),
-    fetchJsonOrEmpty<ReposApiResponse>(
-      `${baseUrl}/api/metrics/repos?days=90`,
-      headers
-    ),
-  ]);
+  // Sequential awaits instead of Promise.all to prevent serverless worker exhaustion.
+  // Parallel loopback fetch() to own API routes forces Next.js to spawn extra
+  // concurrent workers per request, leading to connection pool exhaustion and 504
+  // timeouts under load. Sequential fetches consume only 1 additional worker at a
+  // time, avoiding the cascade deadlock.
+  const contributionsRaw = await fetchJsonOrEmpty<ContributionsApiResponse>(
+    `${baseUrl}/api/metrics/contributions?days=90`,
+    headers
+  );
+  const prsRaw = await fetchJsonOrEmpty<PRsApiResponse>(
+    `${baseUrl}/api/metrics/prs`,
+    headers
+  );
+  const streakRaw = await fetchJsonOrEmpty<StreakApiResponse>(
+    `${baseUrl}/api/metrics/streak`,
+    headers
+  );
+  const reposRaw = await fetchJsonOrEmpty<ReposApiResponse>(
+    `${baseUrl}/api/metrics/repos?days=90`,
+    headers
+  );
 
   const commitsByDay: Record<string, number> = contributionsRaw.data ?? {};
   const commitsArray = Object.entries(commitsByDay)
