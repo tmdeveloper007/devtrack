@@ -21,7 +21,17 @@ function getClientIP(req: NextRequest): string {
   );
 }
 
+function pruneExpiredRateLimits(): void {
+  const now = Date.now();
+  for (const [ip, entry] of rateLimitMap) {
+    if (now > entry.resetAt) {
+      rateLimitMap.delete(ip);
+    }
+  }
+}
+
 function isRateLimited(ip: string): boolean {
+  pruneExpiredRateLimits();
   const now = Date.now();
 
   const entry = rateLimitMap.get(ip);

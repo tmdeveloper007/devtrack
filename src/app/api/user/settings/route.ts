@@ -312,7 +312,10 @@ export async function PATCH(req: NextRequest) {
     updates.preferred_locale = preferred_locale;
   }
 
-  await supabaseAdmin.from("users").update(updates).eq("id", user.id);
+  const { error: updateError } = await supabaseAdmin.from("users").update(updates).eq("id", user.id);
+  if (updateError) {
+    return NextResponse.json({ error: "Failed to update settings" }, { status: 500 });
+  }
 
   return settingsResponse({
     id: user.id,
