@@ -14,7 +14,9 @@ export function sendSSEEvent(
 ): void {
   const connectionsSet = sseConnections.get(userId);
   if (connectionsSet) {
-    for (const controller of connectionsSet) {
+    // Copy the set before iterating to avoid modification-during-iteration
+    const controllers = Array.from(connectionsSet);
+    for (const controller of controllers) {
       try {
         controller.enqueue(
           `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`
