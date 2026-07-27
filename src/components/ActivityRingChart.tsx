@@ -89,6 +89,7 @@ export default function ActivityRingChart() {
         <select
           value={days}
           onChange={(e) => setDays(Number(e.target.value))}
+          aria-label="Select time range for activity ring chart"
           className="rounded-lg border border-[var(--border)] bg-[var(--card)] px-2 py-1 text-sm text-[var(--card-foreground)]"
         >
           <option value={7}>Last 7d</option>
