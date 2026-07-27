@@ -64,6 +64,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Please enter a valid email address." }, { status: 400 });
   }
 
+  const MAX_MESSAGE_LEN = 2000;
+
+  if (message.length > MAX_MESSAGE_LEN) {
+    return NextResponse.json(
+      { error: `Message must be ${MAX_MESSAGE_LEN} characters or fewer.` },
+      { status: 400 }
+    );
+  }
+
   const apiKey = process.env.RESEND_API_KEY;
   const fromEmail = process.env.RESEND_FROM_EMAIL;
   const toEmail = process.env.CONTACT_TO_EMAIL;
