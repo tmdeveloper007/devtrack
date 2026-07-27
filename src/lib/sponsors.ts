@@ -26,7 +26,7 @@ export interface CachedSponsorMetrics extends SponsorMetricsPayload {
 
 const SPONSOR_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes cache TTL
 
-function generateEmptySparkline() {
+export function generateEmptySparkline() {
   const data: { month: string; count: number }[] = [];
   for (let i = 5; i >= 0; i--) {
     const d = new Date();
