@@ -635,6 +635,11 @@ export default function ContributionHeatmap({
         <div className="flex h-[180px] items-center rounded-lg border border-[var(--destructive)]/30 bg-[var(--destructive)]/10 px-4">
           <p className="text-sm text-[var(--destructive)]">{error} Please try refreshing.</p>
         </div>
+      ) : commits.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-[180px] rounded-lg border border-[var(--border)] bg-[var(--card-muted)]/30 px-4 text-center">
+          <p className="text-sm font-medium text-[var(--card-foreground)]">No commits in this range</p>
+          <p className="mt-1 text-xs text-[var(--muted-foreground)]">Try expanding your date range or check your connected GitHub account.</p>
+        </div>
       ) : (
         <>
           <div
