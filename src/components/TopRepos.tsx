@@ -76,9 +76,10 @@ const RepoItem = memo(({
     <li>
       <div className="flex items-center justify-between text-sm mb-1">
         <div className="flex items-center gap-2 max-w-[60%] sm:max-w-[70%]">
-          <button
-            type="button"
-            onClick={() => onSelectActivity(repo.name)}
+          <a
+            href={repo.url || `https://github.com/${repo.name}`}
+            target="_blank"
+            rel="noopener noreferrer"
             className="truncate text-[var(--card-foreground)] transition-colors hover:text-[var(--accent)] text-left font-medium"
             title={[repo.name,repo.description ?? "No description",repo.languages?.[0] ? `Language: ${repo.languages[0].name}` : null,].filter(Boolean).join("\n")}
           >
@@ -89,7 +90,7 @@ const RepoItem = memo(({
                 Pinned
               </span>
             )}
-          </button>
+          </a>
           <a
             href={repo.url || `https://github.com/${repo.name}`}
             target="_blank"
