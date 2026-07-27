@@ -1,5 +1,5 @@
 import { getServerSession } from "next-auth";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth";
 import { supabaseAdmin, isSupabaseAdminAvailable } from "@/lib/supabase";
 
@@ -30,9 +30,8 @@ async function getUserId(githubId: string): Promise<string | null> {
   }
 }
 
-
-// GET — fetch 10 most recent notifications
-export async function GET() {
+// GET — fetch notifications with pagination
+export async function GET(req: Request) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.githubId) {
@@ -41,7 +40,22 @@ export async function GET() {
 
     const userId = await getUserId(session.githubId);
     if (!userId) {
-      return NextResponse.json({ notifications: [], unreadCount: 0 });
+      return NextResponse.json({ notifications: [], unreadCount: 0, totalCount: 0, page: 1, per_page: 20 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
+    const perPage = Math.min(100, Math.max(1, parseInt(searchParams.get("per_page") ?? "20", 10)));
+    const offset = (page - 1) * perPage;
+
+    // Fetch total count for pagination metadata
+    const { count: totalCount, error: countError } = await supabaseAdmin
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId);
+
+    if (countError) {
+      console.error("Failed to fetch notification count:", countError);
     }
 
     const { data, error } = await supabaseAdmin
@@ -49,7 +63,7 @@ export async function GET() {
       .select("id, type, message, read, created_at")
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
-      .limit(10);
+      .range(offset, offset + perPage - 1);
 
     if (error) {
       console.error("Failed to fetch notifications:", error);
@@ -59,10 +73,21 @@ export async function GET() {
       );
     }
 
-    const unreadCount = (data ?? []).filter((n) => !n.read).length;
-    return NextResponse.json({ notifications: data ?? [], unreadCount });
+    // unreadCount is computed from all unread, not just the current page
+    const { count: unreadTotal } = await supabaseAdmin
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("read", false);
+
+    return NextResponse.json({
+      notifications: data ?? [],
+      unreadCount: unreadTotal ?? 0,
+      totalCount: totalCount ?? 0,
+      page,
+      per_page: perPage,
+    });
   } catch (error) {
-    console.error("Unexpected error in notifications GET:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
