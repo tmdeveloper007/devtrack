@@ -449,7 +449,7 @@ export default function StreakTracker() {
       <div className="bg-[var(--card)] rounded-xl p-6 min-h-[700px]">
         <div role="status" aria-live="polite" aria-busy="true">
           <span className="sr-only">Loading streak tracker</span>
-          <SkeletonBlock className="h-6 w-36 mb-4" />
+          <SkeletonBlock className="h-5 w-36 mb-4" />
           <div aria-hidden="true" className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
               <SkeletonBlock key={i} className="h-28 rounded-lg" />

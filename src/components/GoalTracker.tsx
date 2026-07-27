@@ -473,8 +473,8 @@ export default function GoalTracker() {
         </div>
         {[1, 2, 3].map((i) => (
           <div key={i} aria-hidden="true" className="mb-4">
-            <SkeletonBlock className="h-4 w-full mb-2" />
-            <SkeletonBlock className="h-2 w-full" />
+            <SkeletonBlock className="h-5 w-full mb-2" />
+            <SkeletonBlock className="h-1.5 w-full" />
           </div>
         ))}
       </WidgetSkeleton>
