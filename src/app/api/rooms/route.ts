@@ -13,6 +13,13 @@ const MAX_DESCRIPTION_LEN = 500;
 const GITHUB_USERNAME_RE = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$|^[a-zA-Z0-9]$/;
 const GITHUB_REPO_RE = /^[a-zA-Z0-9._-]{1,100}$/;
 
+// Strips zero-width and other invisible Unicode control characters from a string.
+// This prevents invisible character injection in room names and descriptions.
+function stripInvisibleChars(value: string): string {
+  // Zero-width space, word joiner, zero-width non-joiner, zero-width joiner, BOM
+  return value.replace(/[\u200B-\u200F\uFEFF\u00AD]/g, '');
+}
+
 export async function GET() {
   const session = await getServerSession(authOptions);
   if (!session?.user?.name)
@@ -38,10 +45,10 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 });
   }
 
-  const name = body.name?.trim() ?? '';
-  const repoOwner = body.repo_owner?.trim() ?? '';
-  const repoName = body.repo_name?.trim() ?? '';
-  const description = body.description?.trim() ?? '';
+  const name = stripInvisibleChars(body.name?.trim() ?? '');
+  const repoOwner = stripInvisibleChars(body.repo_owner?.trim() ?? '');
+  const repoName = body.repo_name?.trim() ?? ''; // repo name validation via regex handles control chars
+  const description = stripInvisibleChars(body.description?.trim() ?? '');
 
   if (!name)
     return NextResponse.json({ error: 'name is required' }, { status: 400 });
