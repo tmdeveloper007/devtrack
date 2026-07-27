@@ -19,7 +19,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import UserAvatar from "@/components/UserAvatar";
 import KeyboardShortcuts from "@/components/KeyboardShortcuts";
 import OnboardingTour from "@/components/OnboardingTour";
-import { Moon, Sun } from "lucide-react";
+import { Copy, Check, Moon, Sun } from "lucide-react";
 import { toast } from "sonner";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -395,6 +395,20 @@ export default function DashboardHeader() {
             {isPublic === true && session?.githubLogin && (
               <ShareProfileButton githubLogin={session.githubLogin} />
             )}
+
+            <button
+              type="button"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                  toast("Dashboard URL copied to clipboard");
+                });
+              }}
+              aria-label="Copy dashboard URL"
+              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--card-muted)] text-[var(--muted-foreground)] transition-colors hover:bg-[var(--card-muted)]/80 hover:text-[var(--card-foreground)]"
+              title="Copy dashboard URL"
+            >
+              <Copy className="h-4 w-4" />
+            </button>
 
             <div className="flex shrink-0 items-center gap-2 rounded-2xl border border-[var(--border)] bg-[var(--card-muted)]/50 p-2 shadow-sm backdrop-blur-sm">
               <div className="transition-transform duration-200 hover:scale-[1.05]">
