@@ -110,6 +110,8 @@ export async function dispatchWebhook(
   redirect: "manual",
 });
 
+    statusCode = response.status;
+
 if ([301, 302, 303, 307, 308].includes(response.status)) {
   const location = response.headers.get("location");
 
@@ -126,7 +128,7 @@ if ([301, 302, 303, 307, 308].includes(response.status)) {
   }
 }
 
-    statusCode = response.status;
+
     const success = response.ok;
 
     await supabaseAdmin.from("webhook_deliveries").insert({

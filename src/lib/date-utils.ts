@@ -210,10 +210,8 @@ export function utcToLocalDate(
  */
 export function areConsecutiveDays(
   date1: string,
-  date2: string,
-  timezone: string = "UTC"
+  date2: string
 ): boolean {
-  void timezone;
   const d1 = new Date(date1 + "T12:00:00Z");
   const d2 = new Date(date2 + "T12:00:00Z");
   const diffMs = Math.abs(d2.getTime() - d1.getTime());
@@ -257,7 +255,7 @@ export function calculateStreak(
 
   let streak = 1;
   for (let i = 1; i < uniqueDates.length; i++) {
-    if (areConsecutiveDays(uniqueDates[i], uniqueDates[i - 1], userTimezone)) {
+    if (areConsecutiveDays(uniqueDates[i], uniqueDates[i - 1])) {
       streak++;
     } else {
       break;
