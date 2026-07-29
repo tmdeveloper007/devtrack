@@ -61,7 +61,20 @@ const CATEGORY_OPTIONS: GoalCategory[] = ["side-project", "work", "dsa", "open-s
 export function useGoalTracker() {
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [mounted, setMounted] = useState(false);
   const [syncing, setSyncing] = useState(false);
+
+  // Set mounted flag after first render to enable progress bar animation
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (prefersReducedMotion) {
+      setMounted(true);
+    } else {
+      // Small delay to ensure transition from 0% fires on mount
+      const timer = setTimeout(() => setMounted(true), 50);
+      return () => clearTimeout(timer);
+    }
+  }, []);
   const [syncError, setSyncError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [minutesAgo, setMinutesAgo] = useState(0);
@@ -785,7 +798,11 @@ export default function GoalTracker() {
                     className={`h-full rounded-full transition-all ${
                       completed ? "bg-emerald-500" : "bg-[var(--accent)]"
                     }`}
-                    style={{ width: `${Math.max(0, Math.min(pct, 100))}%` }}
+                    style={{
+                      width: mounted
+                        ? `${Math.max(0, Math.min(pct, 100))}%`
+                        : '0%',
+                    }}
                     role="progressbar"
                     aria-valuenow={goal.current}
                     aria-valuemin={0}
