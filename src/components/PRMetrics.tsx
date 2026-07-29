@@ -190,6 +190,8 @@ export default function PRMetrics() {
               <button
                 key={option}
                 onClick={() => setRange(option)}
+                aria-label={`Show ${option} range`}
+                aria-pressed={range === option}
                 className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${range === option
                   ? "bg-[var(--accent)] text-white"
                   : "bg-[var(--control)] text-[var(--muted-foreground)] hover:bg-[var(--card-muted)]"
@@ -202,6 +204,7 @@ export default function PRMetrics() {
           <div className="flex gap-2">
             <button
               onClick={() => setActiveTab("authored")}
+              aria-pressed={activeTab === "authored"}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${activeTab === "authored" ? "bg-[var(--accent)] text-white" : "bg-[var(--control)] text-[var(--muted-foreground)] hover:bg-[var(--card-muted)]"
                 }`}
             >
@@ -209,6 +212,7 @@ export default function PRMetrics() {
             </button>
             <button
               onClick={() => setActiveTab("reviews")}
+              aria-pressed={activeTab === "reviews"}
               className={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors ${activeTab === "reviews" ? "bg-[var(--accent)] text-white" : "bg-[var(--control)] text-[var(--muted-foreground)] hover:bg-[var(--card-muted)]"
                 }`}
             >
@@ -277,6 +281,7 @@ export default function PRMetrics() {
                   <button
                     key={filter}
                     onClick={() => setPrFilter(filter)}
+                    aria-pressed={prFilter === filter}
                     className={`rounded-full px-4 py-1.5 text-xs font-semibold capitalize transition-colors ${prFilter === filter ? "bg-[var(--accent)] text-white" : "bg-[var(--control)] text-[var(--muted-foreground)]"
                       }`}
                   >
