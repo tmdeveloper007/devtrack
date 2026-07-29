@@ -292,6 +292,11 @@ export default async function PublicProfilePage({
             {memberSinceFormatted && (
               <span>Member since {memberSinceFormatted}</span>
             )}
+            {profile.contributions.total > 0 && (
+              <span className="inline-flex items-center rounded-full border border-[var(--border)] bg-[var(--control)] px-3 py-1 text-xs font-medium text-[var(--card-foreground)]">
+                {profile.contributions.total.toLocaleString()} commits
+              </span>
+            )}
             <a
               href={githubUrl}
               target="_blank"
