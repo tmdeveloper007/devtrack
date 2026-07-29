@@ -988,7 +988,7 @@ function FeatureCard({ f, index }: { f: typeof FEATURES[0]; index: number }) {
         transitionDelay: vis ? '0ms' : `${index * 50}ms`,
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        
+        cursor: 'default',
       }}
     >
       
