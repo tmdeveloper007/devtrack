@@ -251,7 +251,7 @@ export default function Footer() {
             </h3>
             <div className="mt-6 flex flex-col gap-3">
               {[
-                "Next.js 14",
+                "Next.js 16",
                 "Tailwind CSS",
                 "Supabase",
                 "TypeScript",

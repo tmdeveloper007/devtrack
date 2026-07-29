@@ -25,6 +25,14 @@ export function csvCell(value: unknown): string {
  * The column order is determined by the keys of the first row.  Subsequent
  * rows that are missing a key emit an empty cell; extra keys are ignored so
  * the header is stable.
+ *
+ * @param rows - Array of objects to serialise. Must be an array; passing a non-array
+ *   will cause a runtime TypeError when accessing Object.keys.
+ * @throws {TypeError} If `rows` is not an Array (e.g., passing null, undefined, or a
+ *   primitive).
+ * @throws {TypeError} If any element in `rows` is not an object (property access returns
+ *   undefined for non-objects, which serialises as an empty cell — callers should guard
+ *   against non-object rows beforehand).
  */
 export function toCsv(rows: Record<string, unknown>[]): string {
   if (rows.length === 0) return "";

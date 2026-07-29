@@ -113,7 +113,16 @@ export default function ActivityRingChart() {
           </p>
         ) : (
           <div className="flex flex-col items-center gap-4">
-            <svg width="300" height="300" viewBox="0 0 300 300">
+            <svg
+              width="300"
+              height="300"
+              viewBox="0 0 300 300"
+              aria-label={
+                peakHour.commits > 0
+                  ? `Activity ring chart showing commit distribution by hour of day, most active at ${formatHour(peakHour.hour)}`
+                  : "Activity ring chart — no commits in the selected period"
+              }
+            >
               {/* Hour labels */}
               {[0, 6, 12, 18].map((h) => {
                 const angle = h * anglePerSegment - Math.PI / 2;

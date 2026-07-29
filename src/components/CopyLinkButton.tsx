@@ -46,8 +46,8 @@ export default function CopyLinkButton({ url }: CopyLinkButtonProps) {
     <button
       onClick={handleCopy}
       type="button"
-      aria-label="Copy profile link"
-      title="Copy profile link"
+      aria-label={copied ? "Link copied to clipboard" : `Copy profile link. Tip: Ctrl+C or Cmd+C also works when focused.`}
+      title="Copy profile link (Ctrl+C / Cmd+C when focused)"
       className="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium rounded-md border border-gray-300 bg-white text-gray-700 shadow-sm hover:bg-gray-50 focus-visible:ring-2 focus-visible:ring-indigo-500 transition-colors dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600 dark:hover:bg-gray-700"
     >
       <span>{copied ? "Copied!" : "Copy link"}</span>

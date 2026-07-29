@@ -9,6 +9,7 @@ import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "rec
 import PRStatusDonutChart from "./PRStatusDonutChart";
 import MiniPRTrendChart from "./MiniPRTrendChart";
 import { SkeletonBlock } from "./WidgetSkeleton";
+import EmptyState from "./EmptyState";
 
 interface PRMetricsSummary {
   open: number;
@@ -266,6 +267,12 @@ export default function PRMetrics() {
             Try again
           </button>
         </div>
+      ) : metrics && metrics.total === 0 && activeTab === "authored" ? (
+        <EmptyState
+          icon="1"
+          title="No pull requests found"
+          description={`You have not created any pull requests in the last ${range}. Connect a GitHub account and start creating PRs to see your analytics here.`}
+        />
       ) : activeTab === "authored" ? (
         <div className="space-y-6">
           {/* GitHub Stats */}
